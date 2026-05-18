@@ -14,7 +14,6 @@ public class ZigzagPattern {
 		int tar = a * a;
 		int res = 0; 
 		
-		
 		for(int i = 1; i < tar; i++) {
 			if (res < a)
 			{
