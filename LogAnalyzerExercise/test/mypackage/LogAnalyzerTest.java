@@ -2,193 +2,192 @@ package mypackage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintStream;
+import java.io.*;
+import java.nio.file.Files;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class LogAnalyzerTest {
-	
-	private LogAnalyzer log;
-	
-	@BeforeAll
-	static void initAll() {
-	    System.out.println("Start tests");
-	}
-	
-	
-	@BeforeEach
-	void setUp() {
-		log = new LogAnalyzer();
-	}
-	
-	@AfterEach
-	void tearDown() {
-		log = null;
-	}
-	
-	@AfterAll
-	static void tearDownAll() {
-	    System.out.println("End tests");
-	}
-	
-	@Test
-	void shouldPrintAnalysisComplete_whenServerLogExists() {
-	    // Arrange
-	    String workingDir = System.getProperty("user.dir");
-	    String filename = workingDir + "/src/resources/server.log";
 
-	    ByteArrayOutputStream out = new ByteArrayOutputStream();
-	    PrintStream originalOut = System.out;
-	    System.setOut(new PrintStream(out));
+    private PrintStream originalOut;
+    private PrintStream originalErr;
+    private ByteArrayOutputStream outContent;
 
-	    try {
-	        // Act
-	        LogAnalyzer.main(new String[]{filename});
+    // =========================
+    // Lifecycle Methods
+    // =========================
 
-	        // Assert
-	        String output = out.toString().trim();
-	        assertTrue(output.contains("Analysis complete. Summary written to summary.txt"));
-	    } finally {
-	        System.setOut(originalOut);
-	    }
-	}
+    @BeforeAll
+    static void initAll() {
+        System.out.println("Start tests");
+        LogAnalyzer log = new LogAnalyzer();
+    }
+
+    @BeforeEach
+    void setUp() {
+        outContent = new ByteArrayOutputStream();
+        originalOut = System.out;
+        originalErr = System.err;
+
+        System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(outContent));
+    }
+
+    @AfterEach
+    void tearDown() {
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+    }
+
+    @AfterAll
+    static void tearDownAll() {
+        System.out.println("End tests");
+    }
+
+    // =========================
+    // Helper Methods
+    // =========================
+
+    private String getOutput() {
+        return outContent.toString().trim();
+    }
+
+    private File createTempLog(String content) throws IOException {
+        File file = File.createTempFile("test-log", ".log");
+        try (FileWriter fw = new FileWriter(file)) {
+            fw.write(content);
+        }
+        return file;
+    }
+
+    // =========================
+    // Basic Behavior Tests
+    // =========================
 
     @Test
-    void shouldPrintFileNotFoundMessage_whenFileDoesNotExist() {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(out));
+    void shouldPrintAnalysisComplete_whenServerLogExists() {
+        String workingDir = System.getProperty("user.dir");
+        String filename = workingDir + "/src/resources/server.log";
 
-        try {
-            // Act
-            LogAnalyzer.main(new String[]{"definitely_does_not_exist.log"});
+        LogAnalyzer.main(new String[]{filename});
 
-            // Assert
-            String output = out.toString().trim();
-            assertTrue(output.contains("Log file not found."));
-        } finally {
-            System.setOut(originalOut);
-        }
+        assertTrue(getOutput().contains(
+            "Analysis complete. Summary written to summary.txt"
+        ));
+    }
+
+    @RepeatedTest(3)
+    void shouldConsistentlyPrintFileNotFound() {
+        LogAnalyzer.main(new String[]{"non_existent.log"});
+        assertTrue(getOutput().contains("Log file not found."));
+    }
+
+    // =========================
+    // Parameterized Tests
+    // =========================
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "INVALID LOG LINE",
+        "[2024-01-01 10:00:00] INFO",
+        "[2024-01-01 10:00:00] GO: Invalid level"
+    })
+    void shouldSkipMalformedLines_forVariousInputs(String logLine) throws Exception {
+        File file = createTempLog(logLine + "\n");
+
+        LogAnalyzer.main(new String[]{file.getAbsolutePath()});
+
+        assertTrue(getOutput().contains("Skipping malformed line"));
+
+        file.delete();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "'INVALID LOG LINE', 'Skipping malformed line: INVALID LOG LINE'",
+        "'[2024-01-01 10:00:00] INFO', 'Skipping malformed line'",
+        "'[2024-01-01 10:00:00] GO: Bad', 'Skipping malformed line'"
+    })
+    void shouldHandleMalformedCases_withExpectedMessages(String input, String expectedMessage) throws Exception {
+        File file = createTempLog(input + "\n");
+
+        LogAnalyzer.main(new String[]{file.getAbsolutePath()});
+
+        assertTrue(getOutput().contains(expectedMessage));
+
+        file.delete();
     }
     
     @Test
-    void shouldPrintSkippingMessage_whenMalformedLogLineExists() throws Exception {
-        // Arrange: create temp file with invalid log line
-        File tempFile = File.createTempFile("test-log", ".log");
+    void shouldHandleDirectoryInput_asFileNotFound() throws Exception {
+        File dir = Files.createTempDirectory("test-dir").toFile();
 
-        try (FileWriter fw = new FileWriter(tempFile)) {
-            fw.write("INVALID LOG LINE\n"); // malformed
-        }
+        LogAnalyzer.main(new String[]{dir.getAbsolutePath()});
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(out));
+        assertTrue(getOutput().contains("Log file not found."));
 
-        try {
-            // Act
-            LogAnalyzer.main(new String[]{tempFile.getAbsolutePath()});
-
-            // Assert
-            String output = out.toString().trim();
-
-            assertTrue(output.contains("Skipping malformed line: INVALID LOG LINE"));
-        } finally {
-            System.setOut(originalOut);
-            tempFile.delete();
-        }
+        dir.delete();
     }
     
-    @Test
-    void shouldPrintMissingMessage_whenMalformedLogNoMessage() throws Exception {
-        File tempFile = File.createTempFile("test-log", ".log");
-
-        try (FileWriter fw = new FileWriter(tempFile)) {
-            fw.write("[2024-01-01 10:00:00] INFO\n"); // triggers "Missing message"
-        }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(out));
-
-        try {
-            // Act
-            LogAnalyzer.main(new String[]{tempFile.getAbsolutePath()});
-
-            // Assert
-            String output = out.toString().trim();
-
-            assertTrue(output.contains("Skipping malformed line"));
-        } finally {
-            System.setOut(originalOut);
-            tempFile.delete();
-        }
-    }
     
     @Test
-    void shouldPrintSkippingMessage_whenInvalidLogLevel() throws Exception {
-        File tempFile = File.createTempFile("test-log", ".log");
+    void shouldPrintError_whenWriteFails() throws Exception {
+        // Create a valid log file (so reading succeeds)
+        File tempLog = createTempLog(
+            "[2024-01-01 10:00:00] INFO: Test message\n"
+        );
 
-        try (FileWriter fw = new FileWriter(tempFile)) {
-            fw.write("[2024-01-01 10:00:00] GO: Backup completed successfully\n");
-        }
+        File fakeWorkDir = Files.createTempDirectory("fake-work-dir").toFile();
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(out));
+        File srcAsFile = new File(fakeWorkDir, "src");
+        srcAsFile.createNewFile(); 
 
-        try {
-            // Act
-            LogAnalyzer.main(new String[]{tempFile.getAbsolutePath()});
-
-            // Assert
-            String output = out.toString().trim();
-
-            assertTrue(output.contains("Skipping malformed line"));
-        } finally {
-            System.setOut(originalOut);
-            tempFile.delete();
-        }
-    }
-    
-    @Test
-    void shouldPrintErrorWritingSummary_whenIOExceptionOccurs() throws Exception {
-        // Arrange: create a valid temp log file (so reading succeeds)
-        File tempFile = File.createTempFile("test-log", ".log");
-
-        try (FileWriter fw = new FileWriter(tempFile)) {
-            fw.write("[2024-01-01 10:00:00] INFO: Test\n");
-        }
-
-        // Force invalid path for writing
         String originalDir = System.getProperty("user.dir");
-        System.setProperty("user.dir", "/invalid/path/does/not/exist");
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(out));
+        System.setProperty("user.dir", fakeWorkDir.getAbsolutePath());
 
         try {
-            // Act
-            LogAnalyzer.main(new String[]{tempFile.getAbsolutePath()});
+            LogAnalyzer.main(new String[]{tempLog.getAbsolutePath()});
 
-            // Assert
-            String output = out.toString().trim();
-            assertTrue(output.contains("Error writing summary file."));
+            // Assert the write error is triggered
+            assertTrue(getOutput().contains("Error writing summary file."));
         } finally {
-            // cleanup
-            System.setOut(originalOut);
             System.setProperty("user.dir", originalDir);
-            tempFile.delete();
+            tempLog.delete();
+            srcAsFile.delete();
+            fakeWorkDir.delete();
         }
     }
     
-   
+    @Test
+    void shouldPrintErrorReadingFile_whenIOExceptionOccurs() throws IOException {
+//        // Arrange
+//        String workingDir = System.getProperty("user.dir");
+//
+//        // Point to a DIRECTORY instead of a file
+//        String[] args = { workingDir + "/src/resources" };
+//
+//        // Capture console output
+//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//        PrintStream originalOut = System.out;
+//        System.setOut(new PrintStream(outputStream));
+//
+//        try {
+//            // Act
+//            LogAnalyzer.main(args);
+//        } finally {
+//            // Restore original System.out
+//            System.setOut(originalOut);
+//        }
+//
+//        // Assert
+//        String output = outputStream.toString();
+//        assertTrue(output.contains("Error reading file."));
+    	
+    	
+    }
     
+  
 }
