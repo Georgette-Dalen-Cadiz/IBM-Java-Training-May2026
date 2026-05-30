@@ -1,0 +1,7 @@
+[2024-03-01 12:00:00] INFO: Service started
+[2024-03-01 12:10:00] WARN: High CPU usage detected
+[2024-03-01 12:20:00] WARN: Memory threshold exceeded
+[2024-03-01 12:30:00] ERROR: Out of memory error
+[2024-03-01 12:40:00] INFO: Service restarted
+[2024-03-01 12:50:00] INFO: Normal operation resumed
+[2024-03-01 13:00:00] INFO: Health check passed

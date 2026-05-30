@@ -1,0 +1,6 @@
+[2024-02-01 08:00:00] INFO: System initialization
+[2024-02-01 08:05:00] INFO: Loading configuration
+[2024-02-01 08:10:00] WARN: Configuration file outdated
+[2024-02-01 08:15:00] ERROR: Failed to load plugin
+[2024-02-01 08:20:00] ERROR: Plugin dependency missing
+[2024-02-01 08:25:00] INFO: Using default configuration

@@ -1,0 +1,12 @@
+Log Summary Report
+------------------
+Total Entries: 5
+INFO: 3
+WARN: 1
+ERROR: 1
+
+Error Messages:
+- Database connection failed
+
+Earliest Timestamp: 2024-01-01T10:00
+Latest Timestamp: 2024-01-01T10:20

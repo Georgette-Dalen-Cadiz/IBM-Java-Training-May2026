@@ -105,5 +105,9 @@ public class LogAnalyzer {
 
         System.out.println("Analysis complete. Summary written to summary.txt");
 	}
+	
+	
+	
+	
 
 }

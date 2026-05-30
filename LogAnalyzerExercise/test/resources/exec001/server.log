@@ -1,0 +1,5 @@
+[2024-01-01 10:00:00] INFO: Application started
+[2024-01-01 10:05:00] WARN: Low memory warning
+[2024-01-01 10:10:00] ERROR: Database connection failed
+[2024-01-01 10:15:00] INFO: Retrying connection
+[2024-01-01 10:20:00] INFO: Connection established

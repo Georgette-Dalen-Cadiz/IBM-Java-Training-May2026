@@ -1,0 +1,12 @@
+Log Summary Report
+------------------
+Total Entries: 7
+INFO: 4
+WARN: 2
+ERROR: 1
+
+Error Messages:
+- Out of memory error
+
+Earliest Timestamp: 2024-03-01T12:00
+Latest Timestamp: 2024-03-01T13:00
