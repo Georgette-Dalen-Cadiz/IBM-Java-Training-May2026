@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+    <h:head>
+        <title>View Employee</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css" />
+        <style>
+            body {
+                background-color: #f0f2f5;
+                font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            .header {
+                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                color: white;
+                padding: 1.5rem 0;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            .header h2 {
+                margin: 0;
+                font-size: 1.8rem;
+                font-weight: 500;
+            }
+            .header .subtitle {
+                margin: 0.5rem 0 0;
+                opacity: 0.9;
+                font-size: 1rem;
+            }
+            .container {
+                max-width: 800px;
+                margin: 2rem auto;
+                padding: 0 1.5rem;
+            }
+            .card {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+                padding: 2rem;
+                transition: box-shadow 0.3s ease;
+            }
+            .card:hover {
+                box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            }
+            .detail-row {
+                margin-bottom: 1.5rem;
+                border-bottom: 1px solid #e9ecef;
+                padding-bottom: 1rem;
+            }
+            .detail-label {
+                font-weight: 600;
+                color: #1e3c72;
+                display: inline-block;
+                width: 100px;
+                font-size: 1rem;
+            }
+            .detail-value {
+                color: #333;
+                font-size: 1rem;
+                word-break: break-word;
+            }
+            .button-bar {
+                margin-top: 2rem;
+                text-align: center;
+            }
+            @media (max-width: 768px) {
+                .container { padding: 0 1rem; }
+                .card { padding: 1.5rem; }
+                .detail-label { width: 80px; }
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <!-- Header -->
+        <div class="header">
+            <div class="container">
+                <h2>👤 Employee Details</h2>
+                <div class="subtitle">View complete information</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container">
+            <div class="card">
+                <p:panel header="Employee Information" style="border: none;">
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span class="detail-value">#{employeeViewBean.employee.name}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Detail:</span>
+                        <span class="detail-value">#{employeeViewBean.employee.detail != null ? employeeViewBean.employee.detail : '—'}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span class="detail-value">
+                            <a href="mailto:#{employeeViewBean.employee.email}" style="color: #2a5298; text-decoration: none;">
+                                #{employeeViewBean.employee.email != null ? employeeViewBean.employee.email : '—'}
+                            </a>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID:</span>
+                        <span class="detail-value">#{employeeViewBean.employee.id}</span>
+                    </div>
+                </p:panel>
+
+                <!-- Action Buttons -->
+                <div class="button-bar">
+                    <p:button outcome="/employeeList.xhtml" value="Back to Employee List"
+                              icon="pi pi-arrow-left"
+                              styleClass="p-button-raised p-button-secondary p-button-rounded"
+                              iconPos="left"/>
+                </div>
+            </div>
+        </div>
+    </h:body>
+</html>

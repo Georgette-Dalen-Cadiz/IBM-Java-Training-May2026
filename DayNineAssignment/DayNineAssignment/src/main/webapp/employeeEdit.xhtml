@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+    <h:head>
+        <title>Edit Employee</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css" />
+        <style>
+            body {
+                background-color: #f0f2f5;
+                font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            .header {
+                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                color: white;
+                padding: 1.5rem 0;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            .header h2 {
+                margin: 0;
+                font-size: 1.8rem;
+                font-weight: 500;
+            }
+            .header .subtitle {
+                margin: 0.5rem 0 0;
+                opacity: 0.9;
+                font-size: 1rem;
+            }
+            .container {
+                max-width: 800px;
+                margin: 2rem auto;
+                padding: 0 1.5rem;
+            }
+            .card {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+                padding: 2rem;
+                transition: box-shadow 0.3s ease;
+            }
+            .card:hover {
+                box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            }
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+            .form-group label {
+                display: block;
+                font-weight: 600;
+                margin-bottom: 0.5rem;
+                color: #1e3c72;
+            }
+            .button-group {
+                display: flex;
+                gap: 1rem;
+                margin-top: 2rem;
+                justify-content: flex-end;
+            }
+            @media (max-width: 768px) {
+                .container { padding: 0 1rem; }
+                .card { padding: 1.5rem; }
+                .button-group { justify-content: center; }
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <!-- Header -->
+        <div class="header">
+            <div class="container">
+                <h2>✏️ Edit Employee</h2>
+                <div class="subtitle">Update employee information</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container">
+            <div class="card">
+                <p:growl autoUpdate="true" showDetail="true" life="3000"/>
+                <h:form>
+                    <p:panel header="Edit Employee" style="border: none;">
+                        <!-- Hidden field to preserve id across postback -->
+                        <h:inputHidden value="#{employeeEditBean.id}" />
+
+                        <div class="form-group">
+                            <p:outputLabel for="name" value="Name" />
+                            <p:inputText id="name" value="#{employeeEditBean.name}" required="true"
+                                         style="width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #ced4da;"/>
+                            <p:message for="name" display="icon"/>
+                        </div>
+
+                        <div class="form-group">
+                            <p:outputLabel for="detail" value="Detail" />
+                            <p:inputTextarea id="detail" value="#{employeeEditBean.detail}"
+                                             rows="4" style="width: 100%; border-radius: 8px; border: 1px solid #ced4da;"/>
+                        </div>
+
+                        <div class="form-group">
+                            <p:outputLabel for="email" value="Email" />
+                            <p:inputText id="email" value="#{employeeEditBean.email}"
+                                         style="width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #ced4da;"/>
+                            <p:message for="email"/>
+                        </div>
+
+                        <div class="button-group">
+                            <p:commandButton value="Update" icon="pi pi-save"
+                                             action="#{employeeEditBean.update}"
+                                             ajax="false" styleClass="p-button-success p-button-raised p-button-rounded"/>
+                            <p:button outcome="/employeeList.xhtml" value="Cancel" icon="pi pi-times"
+                                      styleClass="p-button-secondary p-button-raised p-button-rounded"/>
+                        </div>
+                    </p:panel>
+                </h:form>
+            </div>
+        </div>
+    </h:body>
+</html>

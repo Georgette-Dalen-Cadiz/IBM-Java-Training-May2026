@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="jakartaee-hello-world-test/src/main/java"/>
+	<classpathentry kind="lib" path="jakartaee-hello-world-test/target/jakartaee-hello-world-test/WEB-INF/lib/primefaces-14.0.0-jakarta.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="output" path="jakartaee-hello-world-test/target/classes"/>
+</classpath>
