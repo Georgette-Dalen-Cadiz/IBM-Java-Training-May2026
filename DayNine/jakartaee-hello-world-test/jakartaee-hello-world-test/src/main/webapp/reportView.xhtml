@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <title>Report Detail</title>
+    <f:metadata>
+        <f:viewParam name="index" value="#{reportViewBean.index}" />
+        <f:viewAction action="#{reportViewBean.init}" />
+    </f:metadata>
+</h:head>
+
+<h:body>
+    <h2>Report Detail</h2>
+
+    <div>
+        Title: <h:outputText value="#{reportViewBean.title}" />
+    </div>
+
+    <div>
+        Detail:
+        <h:outputText value="#{reportViewBean.detail}" style="white-space: pre-wrap;" />
+    </div>
+
+    <p:link outcome="/reportList.xhtml" value="Back" />
+</h:body>
+
+</html>

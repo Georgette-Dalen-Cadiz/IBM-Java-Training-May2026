@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="jakarta.faces.core">
+    <h:head>
+        <title>Report List</title>
+        <link rel="stylesheet" href="https://unpkg.com/primeflex@latest/primeflex.css" />
+        <style>
+            body {
+                background-color: #f5f5f5;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 2rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .header h2 {
+                margin: 0;
+                font-size: 1.8rem;
+                font-weight: 600;
+            }
+            .container {
+                max-width: 1200px;
+                margin: 2rem auto;
+                padding: 0 1rem;
+            }
+            .card {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                padding: 2rem;
+            }
+            .action-bar {
+                margin-bottom: 1.5rem;
+                display: flex;
+                justify-content: flex-end;
+            }
+        </style>
+    </h:head>
+    <h:body>
+        <div class="header">
+            <div class="container">
+                <h2>Report List</h2>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="card">
+                <div class="action-bar">
+                    <p:link outcome="/reportNew.xhtml" value="Add"
+                            styleClass="p-button p-button-success p-button-raised"/>
+                </div>
+
+                <h:form>
+                    <p:dataTable value="#{reportListBean.reports}" var="report"
+                                 styleClass="p-datatable-striped"
+                                 paginator="true" rows="10"
+                                 emptyMessage="No Data Found">
+                        <p:column headerText="Title" sortBy="#{report.title}">
+                            <h:outputText value="#{report.title}" />
+                        </p:column>
+                         <p:column headerText="Actions">
+						    <p:commandButton value="Delete"
+			                 action="#{reportListBean.delete(report)}"
+			                 ajax="false" />
+						</p:column>
+						 <p:column headerText="Actions">
+						  <p:link outcome="/reportView.xhtml"
+						        value="View"
+						        styleClass="p-button p-button-info">
+						
+						    <f:param name="index" value="#{reportListBean.reports.indexOf(report)}" />
+						
+						</p:link>
+						</p:column>
+						<p:column headerText="Actions">
+							<p:link outcome="/reportEdit.xhtml"
+							        value="Edit"
+							        styleClass="p-button p-button-warning">
+							    <f:param name="index" value="#{reportListBean.reports.indexOf(report)}" />
+							</p:link>
+						</p:column>
+					
+                        
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </h:body>
+</html>
